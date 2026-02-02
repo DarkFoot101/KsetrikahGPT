@@ -1,51 +1,59 @@
-name : Deploy to Cloud Run
+name: Deploy to Cloud Run
 
 on:
   push:
-    branch:
-      main
+    branches:
+      - main
 
 env:
-  PROJECT_ID : ${{ secrets.GCP_PROJECT_ID}}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # This reads 'kestrikahgpt-486209'
   SERVICE_NAME: ksetrikah-service
   REGION: us-central1
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 1. Authenticate with Google Cloud using your Key
       - name: Authenticate to Google Cloud
-        id: auth
         uses: google-github-actions/auth@v2
-        with: 
-          credentials_json: ${{ secrets.GCP_SA_KEY}}
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      # 2. Set up Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      # 3. Configure Docker
+      - name: Configure Docker
+        run: gcloud auth configure-docker
+
+      # 4. Build and Push the Docker Image
       - name: Build and Push Container
         run: |
-            docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
-            docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
 
+      # 5. Deploy to Cloud Run
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
           image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          flags: '--port=5000 --allow-unauthenticated --memory=2Gi'
+          # IMPORTANT: We pass the API Keys here so the app can use them
           env_vars: |
             OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
             ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}
-            FRONTEND_URL=https://${{ env.SERVICE_NAME }}-${{ env.PROJECT_ID }}.a.run.app
+          flags: '--port=5000 --allow-unauthenticated --memory=2Gi'
 
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
-    
-
-        
+      - name: Show Live URL
+        run: echo "Your app is live at ${{ steps.deploy.outputs.url }}"
