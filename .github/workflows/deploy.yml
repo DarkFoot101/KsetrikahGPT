@@ -53,7 +53,7 @@ jobs:
           env_vars: |
             OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
             ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}
-          flags: '--port=5000 --allow-unauthenticated --memory=2Gi'
+          flags: '--port=5000 --allow-unauthenticated --memory=8Gi --timeout=300s'
 
       - name: Show Live URL
         run: echo "Your app is live at ${{ steps.deploy.outputs.url }}"
