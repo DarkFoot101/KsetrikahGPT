@@ -13,6 +13,10 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# 2.5. Pre-download Whisper Model
+# This downloads the model to the image so it doesn't try to download at runtime
+RUN python -c "import whisper; whisper.load_model('base')"
+
 # 3. COPY EVERYTHING (The Fix 🛠️)
 # Instead of picking files one by one, we copy the WHOLE project.
 # This ensures 'models/', 'src/', 'data/' all get copied exactly as they are.
