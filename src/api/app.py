@@ -51,7 +51,9 @@ try:
     print("✅ Whisper Model Ready.")
 
 except Exception as e:
+    import traceback
     print(f"❌ Critical Error Loading Models: {e}")
+    traceback.print_exc()
     model, encoders, whisper_model = None, None, None
 
 
