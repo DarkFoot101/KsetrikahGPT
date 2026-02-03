@@ -28,7 +28,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 MODEL_PATH = os.path.join(BASE_DIR, "models", "best_model.joblib")
 ENCODER_PATH = os.path.join(BASE_DIR, "models", "encoders.joblib")
 
-print(f"🔍 DEBUG: Looking for model at: {MODEL_PATH}")
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -37,9 +36,14 @@ print("⏳ Loading KsetrikahGPT Brain...")
 try:
     # 1. Load ML Price Model
     if os.path.exists(MODEL_PATH) and os.path.exists(ENCODER_PATH):
+        print("📦 Loading ML models...")
+        print("MODEL PATH:", MODEL_PATH, "exists:", os.path.exists(MODEL_PATH))
+        print("ENCODER PATH:", ENCODER_PATH, "exists:", os.path.exists(ENCODER_PATH))
+
         model = joblib.load(MODEL_PATH)
         encoders = joblib.load(ENCODER_PATH)
-        print("✅ Price Prediction Model Loaded.")
+
+        print("✅ Models loaded successfully")
     else:
         print("⚠️ Warning: Price models not found. Prediction will fail.")
         model, encoders = None, None
