@@ -22,9 +22,13 @@ ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5000")
 
 # Paths
-MODEL_PATH = "models/best_model.joblib"
-ENCODER_PATH = "models/encoders.joblib"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# This sets BASE_DIR to the root '/app' folder
 
+MODEL_PATH = os.path.join(BASE_DIR, "models", "best_model.joblib")
+ENCODER_PATH = os.path.join(BASE_DIR, "models", "encoders.joblib")
+
+print(f"🔍 DEBUG: Looking for model at: {MODEL_PATH}")
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
