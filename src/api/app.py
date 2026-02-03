@@ -553,6 +553,11 @@ async function predict() {
 
   const data = await res.json();
 
+    if (data.error) {
+        alert("Server Error: " + data.error); // This will tell you if the model is missing!
+        return;
+    }
+
   resultBox.classList.remove('hidden');
   price.innerText = `₹ ${data.predicted_price_tomorrow}`;
   trend.className = 'trend ' + (data.trend === 'UP' ? 'up' : 'down');
