@@ -27,6 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 
 MODEL_PATH = os.path.join(BASE_DIR, "models", "best_model.joblib")
 ENCODER_PATH = os.path.join(BASE_DIR, "models", "encoders.joblib")
+print("Success")
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
