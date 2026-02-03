@@ -2,28 +2,30 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# System dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    git \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (for better caching)
+# Install Python deps
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 1. COPY THE MODELS EXPLICITLY
-# This will fail the build if Docker can't find them (which is what we want!)
+# Copy application code FIRST
+COPY src/ ./src/
+COPY app.py ./app.py
+
+# Copy models LAST (never overwritten)
 COPY models/ /app/models/
 
-# 2. Copy the rest of the code
-COPY . .
+# Hard fail if models missing
+RUN test -f /app/models/best_model.joblib
+RUN test -f /app/models/encoders.joblib
 
-# 3. Debug: Print file structure during build to verify
-RUN echo "📂 Checking for models..." && ls -la /app/models/
+# Debug visibility
+RUN echo "📂 Final models directory:" && ls -la /app/models/
 
 EXPOSE 5000
 
-# Ensure we run with unbuffered output so logs show up instantly
 CMD ["python", "-u", "src/api/app.py"]
