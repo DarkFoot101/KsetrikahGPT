@@ -4,19 +4,22 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      README.md
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # This reads 'kestrikahgpt-486209'
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} 
   SERVICE_NAME: ksetrikah-service
   REGION: us-central1
+  REPO_NAME: kesitrikahgpt
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout code
@@ -26,32 +29,43 @@ jobs:
 
       # 1. Authenticate with Google Cloud using your Key
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        id: auth
+        uses: "google-github-actions/auth@v2"
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       # 2. Set up Cloud SDK
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: "google-github-actions/setup-gcloud@v2"
 
       # 3. Configure Docker
-      - name: Configure Docker
-        run: gcloud auth configure-docker
+      - name: Initialize gcloud CLI and Docker auth
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       # 4. Build and Push the Docker Image
       - name: Build and Push Container
+        id: build
         run: |
-          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
-          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          IMAGE_URI=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          echo "Building image: $IMAGE_URI"
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+          echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
+        env:
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+          REGION: ${{ env.REGION }}
+          REPO_NAME: ${{ env.REPO_NAME }}
+          SERVICE_NAME: ${{ env.SERVICE_NAME }}
 
       # 5. Deploy to Cloud Run
       - name: Deploy to Cloud Run
         id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: "google-github-actions/deploy-cloudrun@v2"
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
-          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          image: ${{ steps.build.outputs.image_uri }}
           # IMPORTANT: We pass the API Keys here so the app can use them
           env_vars: |
             OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
