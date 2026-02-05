@@ -153,10 +153,14 @@ KsetrikahGPT/
 ---
 
 ## Project Picture Output
-<img width="1875" height="666" alt="image" src="https://github.com/user-attachments/assets/c4c2e85f-a720-42af-a3c9-cd20521c4fb3" />
 
-<img width="788" height="701" alt="image" src="https://github.com/user-attachments/assets/62065a32-72bf-4edf-b727-d65010ba91a2" />
+<img width="1880" height="748" alt="image" src="https://github.com/user-attachments/assets/71fb37be-494b-47f8-a385-ad3b17d985cc" />
 
+<img width="1890" height="851" alt="image" src="https://github.com/user-attachments/assets/3bf77e8c-c7db-43c7-97e3-f29fe7d3ba89" />
+
+<img width="1890" height="851" alt="image" src="https://github.com/user-attachments/assets/1f0b7073-9c6a-4aed-9358-649c32479490" />
+
+<img width="1038" height="611" alt="image" src="https://github.com/user-attachments/assets/793e6e53-df95-45b8-80c0-0cb6ba726035" />
 
 
 ## 📊 Market Price Prediction (Core ML Module)
@@ -338,3 +342,4 @@ If you want next, I can:
 
 Just tell me what you want next.
 ```
+
