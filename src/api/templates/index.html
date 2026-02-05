@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KsetrikahGPT | Smart Farming</title>
+
+    <!-- Icons -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">
+                <iconify-icon icon="lucide:wheat"></iconify-icon>
+            </div>
+            <div class="brand-text">KsetrikahGPT</div>
+        </div>
+
+        <div class="nav-menu">
+            <div id="nav-market" class="nav-item active" onclick="switchTab('market')">
+                <iconify-icon icon="lucide:trending-up"></iconify-icon>
+                <span>Isi Mandi (Market)</span>
+            </div>
+            <div id="nav-agro" class="nav-item" onclick="switchTab('agro')">
+                <iconify-icon icon="lucide:sprout"></iconify-icon>
+                <span>AI Agronomist</span>
+            </div>
+            <div id="nav-schemes" class="nav-item" onclick="switchTab('schemes')">
+                <iconify-icon icon="lucide:landmark"></iconify-icon>
+                <span>Govt Schemes</span>
+            </div>
+            <div id="nav-updates" class="nav-item" onclick="switchTab('updates')">
+                <iconify-icon icon="lucide:newspaper"></iconify-icon>
+                <span>Updates & News</span>
+            </div>
+            <div id="nav-stories" class="nav-item" onclick="switchTab('stories')">
+                <iconify-icon icon="lucide:quote"></iconify-icon>
+                <span>Stories</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- MARKET PREDICTION SECTION -->
+        <section id="market-section">
+            <header>
+                <h1>Market Price Forecast</h1>
+                <p class="subtitle">Predict tomorrow’s commodity prices using advanced machine learning models tailored
+                    for Indian markets.</p>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Input Form -->
+                <div class="glass-card">
+                    <div class="flex-row">
+                        <div class="form-group full-width">
+                            <label>Commodity Group</label>
+                            <select id="grp" class="select-field">
+                                <option>Cereals</option>
+                                <option>Pulses</option>
+                                <option>Vegetables</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Commodity</label>
+                            <input id="comm" class="input-field" value="Bajra (Pearl Millet)">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Minimum Support Price (MSP) ₹/Quintal</label>
+                        <input id="msp" class="input-field" type="number" value="2775">
+                    </div>
+
+                    <div class="flex-row">
+                        <div class="form-group full-width">
+                            <label>Price Yesterday</label>
+                            <input id="p1" class="input-field" type="number" value="2054">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Price 2 Days Ago</label>
+                            <input id="p2" class="input-field" type="number" value="1987">
+                        </div>
+                    </div>
+
+                    <div class="flex-row">
+                        <div class="form-group full-width">
+                            <label>Arrival Today</label>
+                            <input id="a0" class="input-field" type="number" value="100">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Arrival Yesterday</label>
+                            <input id="a1" class="input-field" type="number" value="167">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Arrival 2 Days Ago</label>
+                            <input id="a2" class="input-field" type="number" value="54">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="predict()">
+                        <iconify-icon icon="lucide:rocket"></iconify-icon>
+                        Analyse & Predict
+                    </button>
+
+                    <div id="marketError" style="color: #f87171; margin-top: 15px; display: none;"></div>
+                </div>
+
+                <!-- Result Display -->
+                <div>
+                    <div id="resultBox" class="glass-card result-box hidden" style="position: sticky; top: 40px;">
+                        <label>Tomorrow's Forecast</label>
+                        <div id="price" class="price-display">₹ 0</div>
+                        <div id="trend" class="trend-badge trend-up">
+                            <iconify-icon icon="lucide:trending-up"></iconify-icon>
+                            Bullish Trend
+                        </div>
+                        <p style="color: var(--text-muted); margin-top: 20px; font-size: 0.9rem;">
+                            Based on historical trends, MSP, and arrival data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI AGRONOMIST SECTION -->
+        <section id="agro-section" class="hidden">
+            <header>
+                <h1>AI Agronomist</h1>
+                <p class="subtitle">Multi-modal AI assistant powered by Vision Models and Whisper. Diagnoses crop
+                    diseases from images and voice notes.</p>
+            </header>
+
+            <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+                <div class="form-group">
+                    <label>Upload Crop Image (Required)</label>
+                    <input type="file" id="cropImage" accept="image/*" class="input-field">
+                </div>
+
+                <div class="form-group">
+                    <label>Voice Note (Optional)</label>
+                    <div class="flex-row" style="gap: 10px; margin-bottom: 10px;">
+                        <button class="btn btn-record" id="recordBtn" onclick="toggleRecording()">
+                            <iconify-icon icon="lucide:mic"></iconify-icon>
+                            Start Recording
+                        </button>
+                    </div>
+                    <div id="recStatus"
+                        style="color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; height: 20px;"></div>
+                    <input type="file" id="voiceNote" accept="audio/*" style="display: none;">
+                    <a href="#" onclick="document.getElementById('voiceNote').click(); return false;"
+                        style="color: var(--secondary); font-size: 0.9rem;">Or upload audio file</a>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Question</label>
+                    <textarea id="promptText" rows="3"
+                        placeholder="e.g., What disease is affecting this leaf? How should I treat it?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Response Language</label>
+                    <select id="responseLang" class="select-field">
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                        <option value="ta">Tamil</option>
+                    </select>
+                </div>
+
+                <button id="analyzeBtn" class="btn btn-primary" onclick="analyzeCrop()">
+                    <iconify-icon icon="lucide:scan-face"></iconify-icon>
+                    Analyze Crop Health
+                </button>
+
+                <div id="agroError" style="color: #f87171; margin-top: 15px; display: none;"></div>
+            </div>
+
+            <!-- AI Response -->
+            <div id="agroResult" class="chat-container hidden">
+                <div class="message-bubble">
+                    <div id="transcribedPrompt"
+                        style="margin-bottom: 15px; font-style: italic; color: var(--text-muted); font-size: 0.9rem; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    </div>
+                    <div id="agroText"></div>
+                    <audio id="agroAudio" controls
+                        style="width: 100%; margin-top: 20px; height: 40px; display: none;"></audio>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCHEMES SECTION -->
+        <section id="schemes-section" class="hidden">
+            <header>
+                <h1>Government Schemes</h1>
+                <p class="subtitle">Explore central and state schemes tailored for your farming needs.</p>
+            </header>
+
+            <div class="glass-card" style="margin-bottom: 30px;">
+                <div class="flex-row" style="align-items: center;">
+                    <iconify-icon icon="lucide:filter" style="font-size: 1.2rem; color: var(--primary);"></iconify-icon>
+                    <span
+                        style="font-weight: 600; color: var(--text-muted); margin-right: auto; margin-left:10px;">Filter
+                        Schemes</span>
+
+                    <select id="schemeFilter" class="select-field" style="width: 200px;" onchange="filterSchemes()">
+                        <option value="all">All States</option>
+                        <option value="central">Central Govt</option>
+                        <option value="maharashtra">Maharashtra</option>
+                        <option value="punjab">Punjab</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="schemes-grid" class="dashboard-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <!-- Schemes injected via JS -->
+            </div>
+        </section>
+
+        <!-- UPDATES SECTION -->
+        <section id="updates-section" class="hidden">
+            <header>
+                <h1>Farmer Updates</h1>
+                <p class="subtitle">Latest announcements, weather alerts, and policy changes.</p>
+            </header>
+
+            <div class="glass-card">
+                <div id="updates-feed" class="updates-container">
+                    <!-- Updates injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- STORIES SECTION -->
+        <section id="stories-section" class="hidden">
+            <header>
+                <h1>Farmer Stories</h1>
+                <p class="subtitle">Success stories from farmers across India.</p>
+            </header>
+
+            <div id="stories-grid" class="dashboard-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+                <!-- Stories injected via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
